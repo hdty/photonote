@@ -1,0 +1,157 @@
+<Window x:Class="PhotoNote.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="PhotoNote"
+        Icon="Assets/PhotoNote.ico"
+        Width="1150" Height="780"
+        MinWidth="960" MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Meiryo UI" FontSize="16"
+        Closing="Window_Closing">
+    <Grid>
+
+        <!-- ============ 写真選び画面 ============ -->
+        <DockPanel x:Name="EditView">
+
+            <Border DockPanel.Dock="Top" Background="#F0F4F8" BorderBrush="#C0C8D0" BorderThickness="0,0,0,1">
+                <DockPanel Margin="12,10">
+                    <Button x:Name="OpenFolderButton" Content="📂 フォルダを開く" FontSize="18" Padding="16,10"
+                            Click="OpenFolder_Click"/>
+                    <Button x:Name="PrintButton" DockPanel.Dock="Right" Content="🖨 印刷する" FontSize="18" Padding="20,10"
+                            FontWeight="Bold" IsEnabled="False" Click="Print_Click"/>
+                    <Button x:Name="SelectAllButton" Content="すべて選択" Padding="12,8" Margin="16,0,0,0"
+                            IsEnabled="False" Click="SelectAll_Click"/>
+                    <Button x:Name="SelectNoneButton" Content="選択を外す" Padding="12,8" Margin="8,0,0,0"
+                            IsEnabled="False" Click="SelectNone_Click"/>
+                    <TextBlock Text="並び順:" VerticalAlignment="Center" Margin="16,0,6,0" Foreground="#444"/>
+                    <ComboBox x:Name="SortCombo" VerticalAlignment="Center" FontSize="14" Padding="8,5"
+                              MinWidth="170" IsEnabled="False" SelectionChanged="Sort_Changed"/>
+                    <TextBlock x:Name="FolderLabel" VerticalAlignment="Center" Margin="16,0"
+                               Foreground="#444" TextTrimming="CharacterEllipsis"
+                               Text="「フォルダを開く」を押して、写真の入っているフォルダを選んでください"/>
+                </DockPanel>
+            </Border>
+
+            <!-- 下部: ステータス + ページ切替 -->
+            <Border DockPanel.Dock="Bottom" Background="#F0F4F8" BorderBrush="#C0C8D0" BorderThickness="0,1,0,0">
+                <Grid Margin="12,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="StatusLabel" Grid.Column="0" VerticalAlignment="Center" Foreground="#444"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button x:Name="PrevPageButton" Content="◀ 前へ" FontSize="18" Padding="20,8"
+                                IsEnabled="False" Click="PrevPage_Click"/>
+                        <TextBlock x:Name="PageLabel" Text="" FontSize="18" VerticalAlignment="Center"
+                                   Margin="20,0" MinWidth="110" TextAlignment="Center"/>
+                        <Button x:Name="NextPageButton" Content="次へ ▶" FontSize="18" Padding="20,8"
+                                IsEnabled="False" Click="NextPage_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 写真 2列×4行 -->
+            <ItemsControl x:Name="PhotoGrid" Background="White">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="2" Rows="4"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#E0E4E8" BorderThickness="0,0,1,1" Padding="8,6">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <CheckBox Grid.Column="0" IsChecked="{Binding Selected, UpdateSourceTrigger=PropertyChanged}"
+                                          VerticalAlignment="Center" Margin="2,0,10,0">
+                                    <CheckBox.LayoutTransform>
+                                        <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
+                                    </CheckBox.LayoutTransform>
+                                </CheckBox>
+
+                                <Border Grid.Column="1" Width="160" Height="112" Background="#F4F4F4"
+                                        VerticalAlignment="Center">
+                                    <Image Source="{Binding Thumbnail}" Stretch="Uniform"
+                                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="2" Margin="12,0,4,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding FileName}" Foreground="#666" FontSize="12"
+                                               TextTrimming="CharacterEllipsis" Margin="0,0,0,3"/>
+                                    <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
+                                             FontSize="16" Padding="4,3" MaxLength="100"
+                                             VerticalContentAlignment="Center"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                        <TextBlock Text="撮影日: " Foreground="#666" FontSize="12"/>
+                                        <TextBlock Text="{Binding DateText}" Foreground="#666" FontSize="12"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </DockPanel>
+
+        <!-- ============ 印刷画面 ============ -->
+        <DockPanel x:Name="PrintView" Visibility="Collapsed">
+
+            <Border DockPanel.Dock="Left" Width="290" Background="#F0F4F8"
+                    BorderBrush="#C0C8D0" BorderThickness="0,0,1,0">
+                <DockPanel Margin="16">
+                    <StackPanel DockPanel.Dock="Bottom" Margin="0,16,0,0">
+                        <Button x:Name="PrintNowButton" Content="🖨 印刷する"
+                                FontSize="20" FontWeight="Bold" Padding="0,12"
+                                Click="PrintNow_Click"/>
+                        <Button x:Name="BackButton" Content="↩ 写真選びに戻る"
+                                FontSize="14" Padding="0,7" Margin="0,10,0,0"
+                                Background="Transparent" BorderBrush="#B0B8C0" Foreground="#444"
+                                Click="Back_Click"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="用紙サイズ" FontWeight="Bold" Margin="0,0,0,6"/>
+                        <ComboBox x:Name="PaperCombo" FontSize="16" Padding="8,6"
+                                  SelectionChanged="Setting_Changed"/>
+
+                        <TextBlock Text="用紙の向き" FontWeight="Bold" Margin="0,16,0,6"/>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="PortraitRadio" Content="縦" GroupName="Orientation"
+                                         Margin="0,0,24,0" Checked="Setting_Changed"/>
+                            <RadioButton x:Name="LandscapeRadio" Content="横" GroupName="Orientation"
+                                         Checked="Setting_Changed"/>
+                        </StackPanel>
+
+                        <TextBlock Text="1ページの写真の枚数" FontWeight="Bold" Margin="0,16,0,6"/>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="Per1Radio" Content="1枚" GroupName="PerPage"
+                                         Margin="0,0,16,0" Checked="Setting_Changed"/>
+                            <RadioButton x:Name="Per2Radio" Content="2枚" GroupName="PerPage"
+                                         Margin="0,0,16,0" Checked="Setting_Changed"/>
+                            <RadioButton x:Name="Per4Radio" Content="4枚" GroupName="PerPage"
+                                         Checked="Setting_Changed"/>
+                        </StackPanel>
+
+                        <TextBlock x:Name="LayoutLabel" Text="写真の並べ方" FontWeight="Bold" Margin="0,16,0,6"/>
+                        <StackPanel x:Name="LayoutPanel" Orientation="Horizontal">
+                            <RadioButton x:Name="VerticalRadio" Content="縦" GroupName="Layout"
+                                         Margin="0,0,24,0" Checked="Setting_Changed"/>
+                            <RadioButton x:Name="HorizontalRadio" Content="横" GroupName="Layout"
+                                         Checked="Setting_Changed"/>
+                        </StackPanel>
+
+                        <TextBlock x:Name="PageCountLabel" Margin="0,20,0,0" Foreground="#444"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <DocumentViewer x:Name="Preview"/>
+        </DockPanel>
+    </Grid>
+</Window>

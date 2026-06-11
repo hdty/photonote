@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>PhotoNote</RootNamespace>
+    <AssemblyName>PhotoNote</AssemblyName>
+    <Version>0.1.0</Version>
+    <Product>PhotoNote</Product>
+    <Copyright>© 2026 HidéToys</Copyright>
+    <Description>写真にメモを付けて印刷するソフト</Description>
+    <NeutralLanguage>ja-JP</NeutralLanguage>
+    <!-- 会社名(作者)欄は使わない。著作権表示のみ -->
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <ApplicationIcon>Assets\PhotoNote.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\HideToysLogo2.png" />
+    <Resource Include="Assets\PhotoNote.ico" />
+  </ItemGroup>
+
+</Project>

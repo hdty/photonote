@@ -1,0 +1,19 @@
+# ビルド成果物
+bin/
+obj/
+*.user
+.vs/
+
+# テスト生成物
+testout/
+testphotos/
+
+# 実在の人物が写ったサンプル(非公開)
+sample/
+
+# 非公開アセット(SVGは公開しない)
+assets/*.svg
+*.svg
+
+# Claude Codeのローカル設定
+.claude/
